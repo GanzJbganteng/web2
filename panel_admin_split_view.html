@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Admin Zenix</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: url("https://files.catbox.moe/gsyfb0.jpg") center/cover no-repeat fixed;
+      color: #fff;
+    }
+    .screen { display: none; padding: 30px; min-height: 100vh; background: rgba(0,0,0,0.8); }
+    .screen.active { display: block; animation: fadeIn 0.4s ease; }
+    input, button {
+      display: block; width: 100%; margin: 10px 0; padding: 12px;
+      border-radius: 8px; border: none; font-size: 1rem;
+    }
+    button { background: #3b82f6; color: #fff; font-weight: bold; cursor: pointer; }
+    .card {
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(10px);
+      padding: 30px; border-radius: 16px; text-align: center;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5); margin-bottom: 20px;
+    }
+    .card img { width: 80px; height: 80px; margin-bottom: 10px; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .logout-btn {
+      background: red; position: fixed; top: 20px; right: 20px; z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="screen active" id="loginScreen">
+  <h2>🔐 Login Panel Admin Zenix</h2>
+  <input type="text" id="loginUsername" placeholder="Masukkan Username">
+  <input type="text" id="loginKey" placeholder="Masukkan KEY Anda">
+  <button onclick="login()">🔓 Login</button>
+  <div id="loginStatus"></div>
+</div>
+
+<!-- Menu Utama -->
+<div class="screen" id="mainMenu">
+  <h2>📋 Menu Admin</h2>
+  <div class="grid">
+    <div class="card rp-only" style="display:none;" onclick="showScreen('addTokenScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg" />
+      <div>➕ Add Token</div>
+    </div>
+    <div class="card rp-only" style="display:none;" onclick="showScreen('addKeyScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg" />
+      <div>🔑 Add Key</div>
+    </div>
+    <div class="card dev-only" style="display:none;" onclick="showScreen('updateScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg" />
+      <div>🆕 Update Script</div>
+    </div>
+    <div class="card dev-only" style="display:none;" onclick="showScreen('addDevScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg-" />
+      <div>➕ Add Developer</div>
+    </div>
+    <div class="card dev-only" style="display:none;" onclick="showScreen('addResellerScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg" />
+      <div>➕ Add Reseller</div>
+    </div>
+    <div class="card dev-only" style="display:none;" onclick="showScreen('addPartnerScreen')">
+      <img src="https://files.catbox.moe/gsyfb0.jpg" />
+      <div>➕ Add Partner</div>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+</div>
+
+<!-- Selayar Fitur -->
+<div class="screen" id="addTokenScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>➕ Add Token</h2>
+  <input type="text" id="tokenInput" placeholder="Token Telegram">
+  <button onclick="addToken()">Tambah Token</button>
+</div>
+
+<div class="screen" id="addKeyScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>🔑 Add Key</h2>
+  <input type="text" id="keyInput" placeholder="KEY">
+  <input type="text" id="ownerInput" placeholder="Nama Owner">
+  <button onclick="addIdKey()">Tambah Key</button>
+</div>
+
+<div class="screen" id="updateScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>🆕 Update Script</h2>
+  <input type="text" id="updateUrl" value="https://raw.githubusercontent.com/...">
+  <button onclick="autoUpdateScript()">Perbarui Sekarang</button>
+</div>
+
+<div class="screen" id="addDevScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>➕ Tambah Developer</h2>
+  <input type="text" id="devName" placeholder="Nama Developer">
+  <input type="text" id="devUser" placeholder="Username">
+  <input type="text" id="devKey" placeholder="KEY">
+  <button onclick="addRoleUser('developer')">Tambah Developer</button>
+</div>
+
+<div class="screen" id="addResellerScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>➕ Tambah Reseller</h2>
+  <input type="text" id="resName" placeholder="Nama Reseller">
+  <input type="text" id="resUser" placeholder="Username">
+  <input type="text" id="resKey" placeholder="KEY">
+  <button onclick="addRoleUser('reseller')">Tambah Reseller</button>
+</div>
+
+<div class="screen" id="addPartnerScreen">
+  <button onclick="showScreen('mainMenu')">← Kembali</button>
+  <h2>➕ Tambah Partner</h2>
+  <input type="text" id="partName" placeholder="Nama Partner">
+  <input type="text" id="partUser" placeholder="Username">
+  <input type="text" id="partKey" placeholder="KEY">
+  <button onclick="addRoleUser('partner')">Tambah Partner</button>
+</div>
+
+<script>
+const githubToken = "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";
+const authRepo = "GanzJbganteng/id";
+const tokenRepo = "GanzJbganteng/db-zenixx";
+const tokenPath = "database.json";
+
+async function fetchFile(repo, path) {
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    headers: { Authorization: `Bearer ${githubToken}` }
+  });
+  const data = await res.json();
+  const content = atob(data.content);
+  return { json: JSON.parse(content), sha: data.sha };
+}
+
+async function updateFile(repo, path, data, sha, message) {
+  await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${githubToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message,
+      content: btoa(JSON.stringify(data, null, 2)),
+      sha
+    })
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function logout() {
+  sessionStorage.clear();
+  location.reload();
+}
+
+async function login() {
+  const username = document.getElementById("loginUsername").value.trim();
+  const key = document.getElementById("loginKey").value.trim();
+  const status = document.getElementById("loginStatus");
+
+  if (!username || !key) return status.innerText = "❌ Harap isi semua field.";
+
+  try {
+    const roles = {
+      developer: await fetchFile(authRepo, "developer.json"),
+      reseller: await fetchFile(authRepo, "reseller.json"),
+      partner: await fetchFile(authRepo, "partner.json")
+    };
+
+    let role = null;
+    if (roles.developer.json.find(u => u.USERNAME === username && u.KEY === key)) role = "developer";
+    else if (roles.reseller.json.find(u => u.USERNAME === username && u.KEY === key)) role = "reseller";
+    else if (roles.partner.json.find(u => u.USERNAME === username && u.KEY === key)) role = "partner";
+
+    if (!role) return status.innerText = "❌ Username atau KEY tidak valid.";
+
+    sessionStorage.setItem("login_key", key);
+    sessionStorage.setItem("login_username", username);
+    sessionStorage.setItem("user_role", role);
+
+    showScreen("mainMenu");
+
+    if (role === "developer") document.querySelectorAll(".dev-only").forEach(e => e.style.display = "block");
+    if (["reseller", "partner", "developer"].includes(role)) document.querySelectorAll(".rp-only").forEach(e => e.style.display = "block");
+
+  } catch (e) {
+    status.innerText = "❌ Gagal mengakses database GitHub.";
+  }
+}
+
+async function addToken() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) return alert("Isi token dulu!");
+  const { json, sha } = await fetchFile(tokenRepo, tokenPath);
+  if (json.tokens.includes(token)) return alert("Token sudah ada.");
+  json.tokens.push(token);
+  await updateFile(tokenRepo, tokenPath, json, sha, `Add token ${token}`);
+  alert("✅ Token ditambahkan!");
+}
+
+async function addIdKey() {
+  const key = document.getElementById("keyInput").value.trim();
+  const owner = document.getElementById("ownerInput").value.trim();
+  if (!key || !owner) return alert("Isi semua data!");
+  const file = await fetchFile(authRepo, "auth.json");
+  if (file.json.find(u => u.KEY === key)) return alert("KEY sudah terdaftar.");
+  file.json.push({ KEY: key, OWNER: owner, STATUS: "active" });
+  await updateFile(authRepo, "auth.json", file.json, file.sha, `Add key ${key}`);
+  alert("✅ KEY berhasil ditambahkan!");
+}
+
+async function autoUpdateScript() {
+  const url = document.getElementById("updateUrl").value.trim();
+  if (!url) return alert("Isi URL update!");
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Gagal fetch update");
+    alert("✅ Update berhasil diambil (butuh overwrite manual di backend).");
+  } catch (e) {
+    alert("❌ Gagal update: " + e.message);
+  }
+}
+
+async function addRoleUser(role) {
+  const prefix = role === 'developer' ? 'dev' : role === 'reseller' ? 'res' : 'part';
+  const name = document.getElementById(`${prefix}Name`).value.trim();
+  const user = document.getElementById(`${prefix}User`).value.trim();
+  const key = document.getElementById(`${prefix}Key`).value.trim();
+
+  if (!name || !user || !key) return alert("Isi semua field!");
+
+  const { json, sha } = await fetchFile(authRepo, `${role}.json`);
+  if (json.find(u => u.USERNAME === user || u.KEY === key)) return alert("User atau KEY sudah ada.");
+  json.push({ NAMA: name, USERNAME: user, KEY: key });
+  await updateFile(authRepo, `${role}.json`, json, sha, `Add ${role}: ${user}`);
+  alert(`✅ ${role} ditambahkan!`);
+}
+</script>
+</body>
+</html>
