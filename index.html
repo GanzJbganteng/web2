@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <title>Panel Admin Zenix</title>
@@ -34,13 +35,17 @@
     }
   </style>
 </head>
-<body><div class="screen active" id="loginScreen">
+<body>
+
+<div class="screen active" id="loginScreen">
   <h2>🔐 Login Panel Admin Zenix</h2>
   <input type="text" id="loginUsername" placeholder="Masukkan Username">
   <input type="text" id="loginKey" placeholder="Masukkan KEY Anda">
   <button onclick="login()">🔓 Login</button>
   <div id="loginStatus"></div>
-</div><div class="screen" id="mainMenu">
+</div>
+
+<div class="screen" id="mainMenu">
   <h2>📋 Menu Admin</h2>
   <div class="grid">
     <div class="card rp-only" style="display:none;" onclick="showScreen('addTokenScreen')">
@@ -65,38 +70,50 @@
     </div>
   </div>
   <button class="logout-btn" onclick="logout()">🚪 Logout</button>
-</div><div class="screen" id="addTokenScreen">
+</div>
+
+<!-- Selayar -->
+<div class="screen" id="addTokenScreen">
   <button onclick="showScreen('mainMenu')">← Kembali</button>
   <h2>➕ Add Token</h2>
   <input type="text" id="tokenInput" placeholder="Token Telegram">
   <button onclick="addToken()">Tambah Token</button>
-</div><div class="screen" id="addKeyScreen">
+</div>
+
+<div class="screen" id="addKeyScreen">
   <button onclick="showScreen('mainMenu')">← Kembali</button>
   <h2>🔑 Add Key</h2>
   <input type="text" id="keyInput" placeholder="KEY">
   <input type="text" id="ownerInput" placeholder="Nama Owner">
   <button onclick="addIdKey()">Tambah Key</button>
-</div><div class="screen" id="updateScreen">
+</div>
+
+<div class="screen" id="updateScreen">
   <button onclick="showScreen('mainMenu')">← Kembali</button>
   <h2>🆕 Update Script</h2>
   <input type="text" id="updateUrl" value="https://raw.githubusercontent.com/...">
   <button onclick="autoUpdateScript()">Perbarui Sekarang</button>
-</div><div class="screen" id="addResellerScreen">
+</div>
+
+<div class="screen" id="addResellerScreen">
   <button onclick="showScreen('mainMenu')">← Kembali</button>
   <h2>➕ Tambah Reseller</h2>
   <input type="text" id="resName" placeholder="Nama Reseller">
   <input type="text" id="resUser" placeholder="Username">
   <input type="text" id="resKey" placeholder="KEY">
   <button onclick="addRoleUser('reseller')">Tambah Reseller</button>
-</div><div class="screen" id="addPartnerScreen">
+</div>
+
+<div class="screen" id="addPartnerScreen">
   <button onclick="showScreen('mainMenu')">← Kembali</button>
   <h2>➕ Tambah Partner</h2>
   <input type="text" id="partName" placeholder="Nama Partner">
   <input type="text" id="partUser" placeholder="Username">
   <input type="text" id="partKey" placeholder="KEY">
   <button onclick="addRoleUser('partner')">Tambah Partner</button>
-</div><script>
-const githubToken = "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"; // GANTI DENGAN TOKEN LO!
+</div>
+
+<script>
 const authRepo = "GanzJbganteng/id";
 const tokenRepo = "GanzJbganteng/db-zenixx";
 const tokenPath = "database.json";
@@ -112,9 +129,7 @@ function logout() {
 }
 
 async function fetchFile(repo, path) {
-  const res = await fetch(`https://corsproxy.io/?https://api.github.com/repos/${repo}/contents/${path}`, {
-    headers: { Authorization: `Bearer ${githubToken}` }
-  });
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
   if (!res.ok) throw new Error("Gagal akses GitHub");
   const data = await res.json();
   const content = atob(data.content);
@@ -144,9 +159,13 @@ async function login() {
     if (found.OWNER?.toLowerCase() === "rofik") {
       document.querySelectorAll(".dev-only").forEach(el => el.style.display = "block");
     }
+
   } catch (e) {
     status.innerText = "❌ Gagal mengakses database GitHub.";
+    console.error(e);
   }
 }
-</script></body>
+</script>
+
+</body>
 </html>
